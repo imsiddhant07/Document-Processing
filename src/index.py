@@ -14,7 +14,7 @@ if __name__ == "__main__":
     client = GrobidClient(config_path="./config.json")
     client.process("processFulltextDocument", "./data/input", output="./data/output/xml", consolidate_citations=True, force=True)
 
-    parsed_file = BeautifulSoup(open("/home/siddhant/Projects/have-a-look-at-my-paper/data/output/xml/P19-1106.tei.xml"), "lxml")
+    parsed_file = BeautifulSoup(open("../data/output/xml/P19-1106.tei.xml"), "lxml")
 
     # ------------------------------------------- 
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     paper_sections['heading'] = heads
     paper_sections['content'] = content
 
-    paper_sections.to_csv("/home/siddhant/Projects/have-a-look-at-my-paper/data/output/csv/sections.csv", index=False)
+    paper_sections.to_csv("../data/output/csv/sections.csv", index=False)
 
 
     # -------------------------------------------
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     citations_data['journal'] = journals
     citations_data['authors'] = authors
 
-    citations_data.to_csv("/home/siddhant/Projects/have-a-look-at-my-paper/data/output/csv/citations.csv", index=False)
+    citations_data.to_csv("../data/output/csv/citations.csv", index=False)
 
 
     # -------------------------------------------
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     ref_sentence_data['ref citation'] = ref_citation
     ref_sentence_data['ref venue'] = ref_venue
 
-    ref_sentence_data.to_csv("/home/siddhant/Projects/have-a-look-at-my-paper/data/output/csv/ref_sentences.csv", index=False)
+    ref_sentence_data.to_csv("../data/output/csv/ref_sentences.csv", index=False)
 
     # ----------------------------------------
 
@@ -98,4 +98,4 @@ if __name__ == "__main__":
     similarity['semantic score'] = ref_semantic
     similarity['lexical score'] = ref_lexical
 
-    similarity.to_csv("/home/siddhant/Projects/have-a-look-at-my-paper/data/output/csv/similarity.csv", index=False)
+    similarity.to_csv("../data/output/csv/similarity.csv", index=False)
