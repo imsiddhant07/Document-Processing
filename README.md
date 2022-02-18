@@ -17,7 +17,8 @@ For -> Grobid Python client has been developed and tested with Python `3.5` and 
 The repository contains a set of scripts for processing PDF files in a directory. The directories are:
 1. `grobid-client/`: the client library for processing PDF files.
 2. `src/`: the scripts for processing xml files.
-3.  `data/`: the data directory for the examples.
+3. `src/experiments`: few initial experiments conducted to develop the solution -> an undocumented shabby python notebook
+4.  `data/`: the data directory for the examples.
 
 ## License 
 
