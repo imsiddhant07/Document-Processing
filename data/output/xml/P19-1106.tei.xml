@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">DeepSentiPeer: Harnessing Sentiment in Review Texts to Recommend Peer Review Decisions</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher>Association for Computational Linguistics</publisher>
+				<availability status="unknown"><p>Copyright Association for Computational Linguistics</p>
+				</availability>
+				<date type="published" when="2019">2019</date>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Tirthankar</forename><surname>Ghosal</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Department of Computer Science and Engineering</orgName>
+								<orgName type="institution">Indian Institute of Technology Patna</orgName>
+								<address>
+									<country key="IN">India</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Rajeev</forename><surname>Verma</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Department of Computer Science and Engineering</orgName>
+								<orgName type="institution">Indian Institute of Technology Patna</orgName>
+								<address>
+									<country key="IN">India</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Asif</forename><surname>Ekbal</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Department of Computer Science and Engineering</orgName>
+								<orgName type="institution">Indian Institute of Technology Patna</orgName>
+								<address>
+									<country key="IN">India</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Pushpak</forename><surname>Bhattacharyya</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Department of Computer Science and Engineering</orgName>
+								<orgName type="institution">Indian Institute of Technology Patna</orgName>
+								<address>
+									<country key="IN">India</country>
+								</address>
+							</affiliation>
+						</author>
+						<title level="a" type="main">DeepSentiPeer: Harnessing Sentiment in Review Texts to Recommend Peer Review Decisions</title>
+					</analytic>
+					<monogr>
+						<title level="m">Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics</title>
+						<meeting>the 57th Annual Meeting of the Association for Computational Linguistics						</meeting>
+						<imprint>
+							<publisher>Association for Computational Linguistics</publisher>
+							<date type="published" when="2019" />
+						</imprint>
+					</monogr>
+					<idno type="MD5">55D59561AF4ACD303CB37E8CEC00E542</idno>
+					<idno type="DOI">10.18653/v1/p19-1106</idno>
+					<ptr type="open-access" target="https://www.aclweb.org/anthology/P19-1106.pdf" />
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.7.0" ident="GROBID" when="2022-02-18T07:49+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<abstract>
+<div xmlns="http://www.tei-c.org/ns/1.0"><p>Automatically validating a research artefact is one of the frontiers in Artificial Intelligence (AI) that directly brings it close to competing with human intellect and intuition. Although criticized sometimes, the existing peer review system still stands as the benchmark of research validation. The present-day peer review process is not straightforward and demands profound domain knowledge, expertise, and intelligence of human reviewer(s), which is somewhat elusive with the current state of AI. However, the peer review texts, which contains rich sentiment information of the reviewer, reflecting his/her overall attitude towards the research in the paper, could be a valuable entity to predict the acceptance or rejection of the manuscript under consideration. Here in this work, we investigate the role of reviewers sentiments embedded within peer review texts to predict the peer review outcome. Our proposed deep neural architecture takes into account three channels of information: the paper, the corresponding reviews, and the review polarity to predict the overall recommendation score as well as the final decision. We achieve significant performance improvement over the baselines (∼ 29% error reduction) proposed in a recently released dataset of peer reviews. An AI of this kind could assist the editors/program chairs as an additional layer of confidence in the final decision making, especially when non-responding/missing reviewers are frequent in present day peer review.</p></div>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="1">Introduction</head><p>The rapid increase in research article submissions across different venues is posing a significant management challenge for the journal editors and conference program chairs 1 . Among the load of works like assigning reviewers, ensuring timely receipt of reviews, slot-filling against the non-responding reviewer, taking informed decisions, communicating to the authors, etc., editors/program chairs are usually overwhelmed with many such demanding yet crucial tasks. However, the major hurdle lies in to decide the acceptance and rejection of the manuscripts based on the reviews received from the reviewers.</p><p>The quality, randomness, bias, inconsistencies in peer reviews is well-debated across the academic community <ref type="bibr" target="#b0">(Bornmann and Daniel, 2010)</ref>. Due to the rise in article submissions and nonavailability of expert reviewers, editors/program chairs are sometimes left with no other options than to assign papers to the novice, out of domain reviewers which sometimes results in more inconsistencies and poor quality reviews. To study the arbitrariness inherent in the existing peer review system, organisers of the NIPS 2014 conference assigned 10% submissions to two different sets of reviewers and observed that the two committees disagreed for more than quarter of the papers <ref type="bibr" target="#b8">(Langford and Guzdial, 2015)</ref>. Again it is quite common that a paper rejected in one venue gets the cut in another with little or almost no improvement in quality. Many are of the opinion that the existing peer review system is fragile as it only depends on the view of a selected few <ref type="bibr" target="#b11">(Smith, 2006)</ref>. Moreover, even a preliminary study into the inners of the peer review system is itself very difficult because of data confidentiality and copyright issues of the publishers. However, the silver lining is that the peer review system is evolving with the likes of OpenReviews 2 , author response periods/rebuttals, increased effective communications between authors and reviewers, open access initiatives, peer review workshops, review forms with objective questionnaires, etc. gaining momentum.</p><p>The PeerRead dataset <ref type="bibr" target="#b7">(Kang et al., 2018)</ref> is an excellent resource towards research and study on this very impactful and crucial problem. With our ongoing effort towards the development of an Artificial Intelligence (AI)-assisted peer review system, we are intrigued with: What if there is an additional AI reviewer which predicts decisions by learning the high-level interplay between the review texts and the papers? How would the sentiment embedded within the review texts empower such decision-making? Although editors/program chairs usually go by the majority of the reviewer recommendations, they still need to go through all the review texts corresponding to all the submissions. A good use case of this research would be: slot-filling the missing reviewer, providing an additional perspective to the editor in cases of contrasting/borderline reviews. This work in no way attempts to replace the human reviewers; instead, we are intrigued to see how an AI can act as an additional reviewer with inputs from her human counterparts and aid the decision-making in the peer review process.</p><p>We develop a deep neural architecture incorporating full paper information and review text along with the associated sentiment to predict the acceptability and recommendation score of a given research article. We perform two tasks, a classification (predicting accept/reject decision) and a regression (predicting recommendation score) one. The evaluation shows that our proposed model successfully outperforms the earlier reported results in PeerRead. We also show that the addition of review sentiment component significantly enhances the predictive capability of such a system.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="2">Related Work</head><p>Artificial Intelligence in academic peer review is an important yet less explored territory. However, with the recent progress in AI research, the topic is gradually gaining attention from the community. <ref type="bibr" target="#b10">Price and Flach (2017)</ref> did a thorough study of the various means of computational support to the peer review system. <ref type="bibr" target="#b9">Mrowinski et al. (2017)</ref> explored an evolutionary algorithm to improve editorial strategies in peer review. The famous Toronto Paper Matching system <ref type="bibr" target="#b2">(Charlin and Zemel, 2013)</ref> was developed to match paper with reviewers. Recently we <ref type="bibr">(Ghosal et al., 2018b,a)</ref> investigated the impact of various fea-tures in the editorial pre-screening process. <ref type="bibr" target="#b12">Wang and Wan (2018)</ref> explored a multi-instance learning framework for sentiment analysis from the peer review texts. We carry our current investigations on a portion of the recently released PeerRead dataset <ref type="bibr" target="#b7">(Kang et al., 2018)</ref>. Study towards automated support for peer review was otherwise not possible due to the lack of rejected paper instances and corresponding reviews. Our approach achieves significant performance improvement over the two tasks defined in <ref type="bibr" target="#b7">Kang et al. (2018)</ref>. We attribute this to the use of deep neural networks and augmentation of review sentiment information in our architecture.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3">Data Description and Analysis</head><p>The PeerRead dataset consists of papers, a set of associated peer reviews, and corresponding accept/reject decisions with aspect specific scores of papers collected from several top-tier Artificial Intelligence (AI), Natural Language Processing (NLP) and Machine Learning (ML) conferences. Table <ref type="table">1</ref> shows the data we consider in our experiments. We could not consider NIPS and arXiv portions of PeerRead due to the lack of aspect scores and reviews, respectively. For more details on the dataset creation and the task, we request the readers to refer to <ref type="bibr" target="#b7">Kang et al. (2018)</ref>. We further use the submissions of ICLR 2018, corresponding reviews and aspect scores to boost our training set for the decision prediction task. One motivation of our work stems from the finding that aspect scores for certain factors like Impact, Originality, Soundness/Correctness which are seemingly central to the merit of the paper, often have very low correlation with the final recommendation made by the reviewers as is made evident in <ref type="bibr" target="#b7">Kang et al. (2018)</ref>. However, from the heatmap in Figure <ref type="figure">1</ref> we can see that the reviewer's sentiments (compound/positive) embedded within the review texts have visible correlations with the aspects like Recommendation, Appropriateness and Overall Decision. This also seconds our recent finding that determining the scope or appropriateness of an article to a venue is the first essential step in peer review <ref type="bibr" target="#b3">(Ghosal et al., 2018a)</ref>. Since our study aims at deciding the fate of the paper, we take predicting recommendation score and overall decision as the objectives of our investigation. Thus our proposal to augment sentiment of reviews to the deep neural architecture seems intuitive. pos→Positive Sentiment Score, neg→Negative Sentiment Score, neu→Neutral Sentiment Score, com→Compound Sentiment Score. To calculate the sentiment polarity of a review text, we take the average of the sentence wise sentiment scores from Valence Aware Dictionary and sEntiment Reasoner (VADER) <ref type="bibr" target="#b6">(Hutto and Gilbert, 2014)</ref>.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4">Methodology</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.1">Pre-processing</head><p>At the very beginning, we convert the papers in PDF to .json encoded files using the Science Parse 3 library.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2">DeepSentiPeer Architecture</head><p>Figure <ref type="figure" target="#fig_0">2</ref> illustrates the overall architecture we employ in our investigation. The left segment is for the decision prediction while the right segment predicts the overall recommendation score.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2.1">Document Encoding</head><p>We extract full-text sentences from each research article and represent each sentence s i ∈ R d using the Transformer variant of the Universal Sentence 3 https://github.com/allenai/science-parse Encoder (USE) <ref type="bibr" target="#b1">(Cer et al., 2018)</ref>, d is the dimension of the sentence semantic vector which is 512. A paper is then represented as,</p><formula xml:id="formula_0">P = s 1 ⊕ s 2 ⊕ ... ⊕ s n 1 , P ∈ R n 1 × d</formula><p>⊕ being the concatenation operator, n 1 is the maximum number of sentences in a paper text in the entire dataset (padding is done wherever necessary). Similarly, we do this for each of the reviews and create a review representation as</p><formula xml:id="formula_1">R = s 1 ⊕ s 2 ⊕ ... ⊕ s n 2 , R ∈ R n 2 × d</formula><p>n 2 being the maximum number of sentences in the reviews.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2.2">Sentiment Encoding</head><p>The sentiment encoding of the review is done using VADER Sentiment Analyzer. For a sentence s i , VADER gives a vector S i , S i ∈ R 4 . The review is then encoded (padded where necessary) for sentiment as</p><formula xml:id="formula_2">r senti = S 1 ⊕ S 2 ⊕ ... ⊕ S n 2 , r senti ∈ R n 2 ×4 .</formula></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2.3">Feature Extraction with Convolutional Neural Network</head><p>We make use of a Convolutional Neural Network (CNN) to extract features from both the paper and review representations. CNN has shown great success in solving the NLP problems in recent years. The convolution operation works by sliding a filter W f k ∈ R l×d to a window of length l, the output of such h th window is given as,</p><formula xml:id="formula_3">f k h = g(W f k • X h−l+1:h + b k )</formula><p>X h−l+1:h means the l sentences within the h th window in Paper P. b k is the bias for the k th filter, g() is the non-linear function. The feature map f k for the k th filter is then obtained by applying this filter to each possible window of sentences in the P as</p><formula xml:id="formula_4">f k = [f k 1 , f k 2 , ..., f k h , ..., f k n 1 −l+1 ], f k ∈ R n 1 −l+1 .</formula><p>We then apply a max-pooling operation to this filter map to get the most significant feature, fk as fk = max(f k ). For a paper P, the final output of this convolution filter is then given as</p><formula xml:id="formula_5">p = [ f1 , f2 , ..., fk , ..., f F ], p ∈ R F ,</formula><p>F is the total number of filters used. In the same way, we can get r as the output of the convolution operator for the Review R.</p><p>We call the outputs p and r as the high-level representation feature vector of the paper and the review, respectively. We then concatenate these feature vectors (Feature-Level Fusion). The reason we extract features from both is to simulate the editorial workflow, wherein ideally, the editor/chair would look at both into the paper and the corresponding reviews to arrive at a judgement.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2.4">Multi-layer Perceptron</head><p>We employ a Multi-Layer Perceptron (MLP Predict) to take the joint paper+review representations x pr as input to get the final representation as</p><formula xml:id="formula_6">x pr = f M LP P redict (θ predict ; [p, r]),</formula><p>where θ predict represents the parameters of the MLP Predict. We also extract features from the review sentiment representation x rs via another MLP (MLP Senti).</p><formula xml:id="formula_7">x rs = f M LP Senti (θ senti ; r senti ),</formula><p>θ senti being the parameters of MLP Senti. Finally, we fuse the extracted review sentiment feature and joint paper+review representation together to generate the overall recommendation score (Decision-Level Fusion) using the affine transformation as</p><formula xml:id="formula_8">prediction = (W d • [x pr , x rs ] + b d ).</formula><p>We minimize the Mean Square Error (MSE) between the actual and predicted recommendation score. The motivation here is to augment the human judgement (review+embedded sentiment) regarding the quality of a paper in decision making. The long-term objective is to have the AI learn the notion of good and bad papers from the human perception reflected in peer reviews in correspondence with paper full-text.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2.5">Accept/Reject Decisions</head><p>Instead of training the deep network on overall recommendation scores, we train the network with the final decisions of the papers in a classification setting. The entire setup is same but we concatenate all the reviews of a particular paper together to get the review representation. And rather than doing decision-level fusion, we perform featurelevel fusion where the decision is given as</p><formula xml:id="formula_9">x prs = f M LP P redict (θ; [p, r, x rs ]) c = Sof tmax(W c • x prs + b c ),</formula><p>where c is the output classification distribution across accept or reject classes. r is the high-level representation of review text after concatenating all reviews corresponding to a paper and x rs is the output of MLP Senti on the concatenated review text. We minimize Cross-Entropy Loss between predicted c and actual decisions.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.3">Experimental Setup</head><p>As we mention earlier, we undertake two tasks: Task 1: Predicting the overall recommendation score (Regression) and Task 2: Predicting the Accept/Reject Decision (Classification).</p><p>To compare with <ref type="bibr" target="#b7">Kang et al. (2018)</ref>, we keep the experimental setup (train vs test ratio) identical and re-implement their codes to generate the comparing figures. However, <ref type="bibr" target="#b7">Kang et al. (2018)</ref> performed Task 2 on ICLR 2017 dataset with handcrafted features, and Task 1 in a deep learning setting. Since our approach is a deep neural network based, we crawl additional paper+reviews from ICLR 2018 to boost the training set.</p><p>For Task 1, n 1 is 666 and n 2 is 98 while for Task 2, n 1 is 1494 and n 2 is 525. We employ a grid search for hyperparameter optimization. For Task 1, F is 256, l is 5. ReLU is the non-linear function g(), learning rate is 0.007. We train the model with SGD optimizer, set momentum as 0.9  and batch size as 32. We keep dropout at 0.5. We use the same number of filters with the same kernel size for both paper and review. In Task 2, for Paper CNN F is 128, l is 7 and for Review CNN F is 64 and l is 5. Again we train the model with Adam Optimizer, keep the batch size as 64 and use 0.7 as the dropout rate to prevent overfitting. We intentionally keep our CNN/MLP shallow due to less training data. We make our codes 4 available for further explorations.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Baseline</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5">Results and Analysis</head><p>Table <ref type="table" target="#tab_1">2</ref> and Table <ref type="table" target="#tab_3">3</ref> show our results for both the tasks. We propose a simple but effective architecture in this work since our primary intent is to establish that a sentiment-aware deep architecture would better suit these two problems.</p><p>For Task 1, we can see that our review sentiment augmented approach outperforms the baselines and the comparing systems by a wide margin (∼ 29% reduction in error) on the ICLR 2017 dataset. With only using review+sentiment information, we are still able to outperform <ref type="bibr" target="#b7">Kang et al. (2018)</ref> by a margin of 11% in terms of RMSE. A further relative error reduction of 19% with the addition of paper features strongly suggests that only review is not sufficient for the final recommendation. A joint model of the paper content and review text (the human touch) augmented with the underlying sentiment would efficiently guide the prediction.</p><p>For Task 2, we observe that the handcrafted feature-based system by <ref type="bibr" target="#b7">Kang et al. (2018)</ref> performs inferior compared to the baselines. This is because the features were very naive and did not 4 https://github.com/aritzzz/DeepSentiPeer address the complexity involved in such a task. We perform better with a relative improvement of 28% in terms of accuracy, and also our system is end-toend trained. Presumably, to some extent, our deep neural network learned to distinguish between the probable accept versus probable reject by extracting useful information from the paper and review data.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.1">Cross-Domain Experiments</head><p>With the additional (but less) data of ACL 2017 and CoNLL 2016 in PeerRead, we perform the cross-domain experiments. We do training with the ICLR data (core Machine Learning papers) and take the test set from the NLP conferences (ACL/CoNLL). NLP nowadays is mostly machine learning (ML) centric, where we find several applications and extensive usage of ML algorithms to address different NLP problems. Here we observe a relative error reduction of 4.8% and 14.5% over the comparing system for ACL 2017 and CoNLL 2016, respectively (Table <ref type="table" target="#tab_1">2</ref>). For the decision prediction task, the comparing system performs even worse, and we outperform them by a considerable margin of 28% (ACL 2017) and 26% (CoNLL 2017), respectively (Table <ref type="table" target="#tab_3">3</ref>). The reason is that the work reported in <ref type="bibr" target="#b7">Kang et al. (2018)</ref> relies on elementary handcrafted features extracted only from the paper; does not consider the review features whereas we include the review features along with the sentiment information in our deep neural architecture. However, we also find that our approach with only Review+Sentiment performs inferior to the Paper+Review method in <ref type="bibr" target="#b7">Kang et al. (2018)</ref> for ACL 2017. This again seconds that inclusion of paper is vital in recommendation decisions. Only paper is enough for a human reviewer, but with the current state of AI, an AI reviewer would need the supervision of her human counterparts to arrive at a recommendation. So our system is suited to cases where the editor needs an additional judgment regarding a submission (such as dealing with missing/non-responding reviewers, an added layer of confidence with an AI which is aware of the past acceptances/rejections of a specific venue).</p><p>6 Analysis: Effect of Sentiment on Reviewer's Recommendation  This is to account for the fact that sentiment is actually correlated with the prediction signifying the strength of the model.</p><p>Figure <ref type="figure" target="#fig_1">3</ref> shows the output activations 5 from the final layer of MLP Senti against the predicted recommendation scores. We can see that the papers are discriminated into visible clusters according to their recommendation scores. This proves that DeepSentiPeer can extract useful features in close correspondence to human judgments. From Figure <ref type="figure" target="#fig_2">3 and Table 4</ref>, we see that the sentiment activations are strongly correlated (negatively) with <ref type="bibr">5</ref> We call them as Sentiment Activations the actual and predicted recommendation scores. Therefore, we hypothesize that our model draws considerable strength if the review text has proper sentiment embedded in it. To further investigate this, we sample the papers/reviews from the ICLR 2017 test set. We consider actual review text and the sentiment embedded therein to examine the performance of the system (See Table <ref type="table" target="#tab_8">5</ref>). We truncate the lengthy review texts and provide the OpenReview links for reference. Appendix A shows the heatmaps of Vader sentiment scores generated for individual sentences corresponding to each paper review in Table <ref type="table" target="#tab_8">5</ref>. We hereby acknowledge that since the scholarly review texts are mostly objective and not straightforward, the score for neutral polarity is strong as opposed to positive, and negative. But still, we can see visible polarities for review sentences which are positive or negative in sentiment. For instance, the second last sentence(s9): "The paper is not well written either" from R1 has visible negative weight in the heatmap (Figure <ref type="figure" target="#fig_4">5</ref>  Besides the objective evaluation of the paper in the peer reviews, the reviewer's opinion in the peer review text holds strong correspondence with the overall recommendation score. We can qualitatively see that the reviews R1, R2, and R3 are polarized towards the negative sentiment (Table <ref type="table" target="#tab_8">5</ref>). Our model can efficiently predict a reasonable recommendation score with respect to human judgment. Same we can say for R7 where the review mostly signifies a positive sentiment polarity. R6 provides an interesting observation. We see that the review R6 is not very expressive for such a -The technical contribution of this paper is not clear. Most of the approaches used are standard state-of-art methods and there are not much novelties. For a multi-label recognition task, there are other available methods, e.g. using binary models, changing cross-entropy loss function, etc. There is not any comparison between the RNN method and other simple baselines. The order of the sequential RNN prediction is not clear either. It seems that the attributes form a tree hierarchy, and that is used as the order of sequence. The paper is not well written either.https://openreview.net/forum?id=HyWDCXjgx&amp;noteId=B1Mp8grVl 4 3 0.01</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>R2</head><p>Transformation based Models of Video Sequences -While I agree with the authors on these points, I also find that the paper suffer from important flaws. Specifically: -the choice of not comparing with previous approaches in term of pixel prediction error seems very "convenient", to say the least. While it is clear that the evaluation metric is imperfect, it is not a reason to completely dismiss all quantitative comparisons with previous work. The frames output by the network on, e.g. the moving digits datasets (Figure <ref type="figure" target="#fig_2">4</ref>), looks ok and can definitely be compared with other papers. Yet, the authors chose not to, which is suspicious.https://openreview.net/forum?id=HkxAAvcxx&amp;noteId= SJE7-lkVx But in the experiments, when d=1, there is still a large gap ( 14s vs. 90s) between the proposed method and the standard one. The authors explain this as "likely a language implementation", which is not convincing. To fairly compare the two methods, of course you need to implement both in the same programming language and run experiments in the same environment. For higher degree feature expansion, there is no empirical experiments to show the advantage of the proposed method.https: //openreview.net/forum?id=S1j4RqYxg&amp;noteId=B17Fn04Vg -Hierarchical modeling is an important and high impact problem, and I think that it's underexplored in the Deep Learning literature.Pros:-The few-shot learning results look good, but I' mm not an expert in this area.-The idea of using a "double" variational bound in a hierarchical generative model is well presented and seems widely applicable. Questions:-When training the statistic network, are minibatches (i.e. subsets of the examples) used?-If not, does using minibatches actually give you an unbiased estimator of the full gradient (if you had used all examples)? For example, what if the statistic network wants to pull out if *any* example from the dataset has a certain feature and treat that as the characterization.This seems to fit the graphical model on the right side of figure 1. If your statistic network is trained on minibatches, it won't be able to learn this characterization, because a given minibatch will be missing some of the examples from the dataset.Using minibatches (as opposed to using all examples in the dataset) to train the statistic network seems like it would limit the expressive power of the modelhttps://openreview.net/forum?id=HJDBUF5le&amp;noteId=HyWm1orEx 6 8 -0.65</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>R6 A recurrent neural network without chaos</head><p>The authors of the paper set out to answer the question whether chaotic behaviour is a necessary ingredient for RNNs to perform well on some tasks.For that question's sake,they propose an architecture which is designed to not have chaos. The subsequent experiments validate the claim that chaos is not necessary.This paper is refreshing. Instead of proposing another incremental improvement, the authors start out with a clear hypothesis and test it. This might set the base for future design principles of RNNs.The only downside is that the experiments are only conducted on tasks which are known to be not that demanding from a dynamical systems perspective; it would have been nice if the authors had traversed the set of data sets more to find data where chaos is actually necessary. https://openreview.net/forum?id=S1dIzvclg&amp;noteId=  high recommendation score 8. It starts with introducing the authors work and listing the strengths and limitations of the work without much (and necessary) details. Our model hence predicts 5 as the recommendation score. Whereas R4 can be seen as the case of a usual well-written review, expressing the positive and negative aspects of the paper coherently. Our model predicts 6 for an actual recommendation score of 7. These validate the role of the reviewer's opinion and sentiment to predict the recommendation score, and our model is competent enough to take into account the overall polarity of the review-text to drive the prediction. Figure <ref type="figure" target="#fig_2">4</ref> presents the confusion matrix of our proposed model on ICLR 2017 test data for Task 2.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="7">Conclusion</head><p>Here in this work, we show that the reviewer sentiment information embedded within peer review texts could be leveraged to predict the peer review outcomes. Our deep neural architecture makes use of three information channels: the paper full-text, corresponding peer review texts and the sentiment within the reviews to address the complex task of decision making in peer review. With further exploration, we aim to mould the ongoing research to an efficient AI-enabled system that would assist the journal editors or conference chairs in making informed decisions. However, considering the sensitivity of the topic, we would like to further dive deep into exploring the subtle nuances that leads into the grading of peer review aspects. We found that review reliability prediction should prelude these tasks since not all reviews are of equal quality or are significant to the final decision making. We aim to include review reliability prediction in the pipeline of our future work. However, we are in consensus that scholarly language processing is not straightforward. We need stronger, pervasive models to capture the high-level interplay of the paper and peer reviews to decide the fate of a manuscript. We intend to work upon those and also explore more sophisticated techniques for sentiment polarity encoding.</p><p>A Heatmaps Depicting Sentiment Polarity in Review Texts </p></div><figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0"><head>Figure 2 :</head><label>2</label><figDesc>Figure 2: DeepSentiPeer: A Sentiment Aware Deep Neural Architecture to Predict Reviewer Recommendation Score. Decision-Level Fusion and Feature-Level Fusion of Sentiment are shown for Task 1 and Task 2, respectively.</figDesc><graphic coords="4,72.00,62.81,453.54,453.54" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1"><head>Figure 3 :</head><label>3</label><figDesc>Figure 3: Projections of the output activations of the final layer of MLP Senti. Points are annotated for Reviews from Table 4. X: Predicted Recommendation Scores, Y: Sentiment Activations</figDesc><graphic coords="7,72.00,224.39,226.77,180.88" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_2"><head>Figure 4 :</head><label>4</label><figDesc>Figure 4: Normalized Confusion Matrix for Accept/Reject Decisions on ICLR 2017 test data with DeepSentiPeer(Paper+Review+Sentiment) model.</figDesc><graphic coords="7,375.58,428.19,85.25,85.25" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_3"><head></head><label></label><figDesc>relevant papers should be cited from the recent literature.The experiment part is very weak. This paper claims that the time complexity of their algorithm is O</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_4"><head>Figure 5 :</head><label>5</label><figDesc>Figure 5: Heatmaps of the sentence-wise VADER sentiment polarity of reviews considered in Table 4. Reviews generally reflect the polarity of the reviewer towards the respective work. s0...sn → are the sentences in the peer review texts.</figDesc><graphic coords="11,72.00,109.46,453.54,566.94" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_1"><head>Table 2 :</head><label>2</label><figDesc>Results on Aspect Score Prediction Task. Training is done with only ICLR 2017 papers/reviews, † → Cross-Domain: Training on ICLR and testing upon entire data of ACL/CoNLL available in PeerRead dataset, ‡ → Test set is kept the same as<ref type="bibr" target="#b7">(Kang et al., 2018)</ref>, RMSE→Root Mean Squared Error. CNN variant as in<ref type="bibr" target="#b7">(Kang et al., 2018)</ref> is used as the comparing system.</figDesc><table><row><cell></cell><cell>Task 1 →</cell><cell cols="3">Aspect Score Prediction (RMSE)</cell></row><row><cell></cell><cell>Test Datasets →</cell><cell cols="2">ICLR  ‡ ACL  †</cell><cell>CoNLL  †</cell></row><row><cell></cell><cell>Approaches ↓</cell><cell>2017</cell><cell>2017</cell><cell>2016</cell></row><row><cell>Baselines</cell><cell>Majority Baseline Mean Baseline</cell><cell cols="2">1.6940 2.7968 1.6095 2.4900</cell><cell>2.9133 2.6086</cell></row><row><cell></cell><cell>Only Paper (Kang et al., 2018)</cell><cell cols="2">1.6462 2.7278</cell><cell>3.0591</cell></row><row><cell>Comparing Systems</cell><cell>Only Review (Kang et al., 2018)</cell><cell cols="2">1.6955 2.7062</cell><cell>2.7072</cell></row><row><cell></cell><cell cols="3">Paper+Review (Kang et al., 2018) 1.6496 2.5011</cell><cell>2.9734</cell></row><row><cell></cell><cell>Only Review</cell><cell cols="2">1.5812 2.7191</cell><cell>2.6537</cell></row><row><cell cols="2">Proposed Architecture Review+Sentiment</cell><cell cols="2">1.4521 2.6845</cell><cell>2.5524</cell></row><row><cell>DeepSentiPeer</cell><cell>Paper+Review+Sentiment</cell><cell cols="2">1.1679 2.3790</cell><cell>2.5399</cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_3"><head>Table 3 :</head><label>3</label><figDesc>Results on Accept/Reject Classification Tasks. Training is done with ICLR 2017+ICLR 2018 papers/reviews, † → Cross-Domain: Training on ICLR and testing upon the entire data of ACL/CoNLL, ‡TestSet is kept the same as<ref type="bibr" target="#b7">(Kang et al., 2018)</ref>, RMSE→Root Mean Squared Error, * →65.79% if only trained with ICLR 2017, Comparing System<ref type="bibr" target="#b7">(Kang et al., 2018)</ref> is feature-based and considers only paper, and not the reviews.</figDesc><table /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_4"><head>Table 4 :</head><label>4</label><figDesc></figDesc><table /><note>Pearson Correlation (PC) Coefficient between the Recommendation Scores and Sentiment Activations.</note></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_6"><head></head><label></label><figDesc>While none of the pieces of this model are particularly novel, the result is an efficient learning algorithm for document representation with good empirical performance.Joint training of word and document embeddings is not a new idea, nor is the idea of enforcing the document to be represented by the sum of its word embeddings (see, e.g. see, e.g. "The Sum of Its Parts": Joint Learning of Word and Phrase Representations with Autoencoders' by Lebret and Collobert). Furthermore, the corruption mechanism is nothing other than traditional dropout on the input layer. Coupled with the word2vec-style loss and training methods, this paper offers little on the novelty front.On the other hand, it is very efficient at generation time, requiring only an average of the word embeddings rather than a complicated inference step as in Doc2Vec. Moreover, by construction, the embedding captures salient global information about the document -it captures specifically that information that aids in local-context prediction. For such a simple model, the performance on sentiment analysis and document classification is quite encouraging.Overall, despite the lack of novelty, the simplicity, efficiency, and performance of this model make it worthy of wider readership and study, and I recommend acceptance.-https://openreview.net/</figDesc><table><row><cell></cell><cell></cell><cell></cell><cell></cell><cell>4</cell><cell>3</cell><cell>0.27</cell></row><row><cell>R4</cell><cell cols="2">Efficient Vector Represen-tation for Documents through Corruption</cell><cell>-forum?id=B1Igu2ogg&amp;noteId=rJBM9YbVg</cell><cell>6</cell><cell>7</cell><cell>-1.04</cell></row><row><cell cols="2">R5 R5</cell><cell></cell><cell></cell><cell></cell><cell></cell></row><row><cell></cell><cell cols="2">Towards</cell><cell></cell><cell></cell><cell></cell></row><row><cell></cell><cell>a</cell><cell>Neural</cell><cell></cell><cell></cell><cell></cell></row><row><cell></cell><cell cols="2">Statistician</cell><cell></cell><cell></cell><cell></cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_7"><head></head><label></label><figDesc>The approach is well motivated and the paper is well written, except for some intuitions for why the batch version outperforms the on-line version (see comments on "clarification regarding batch vs. online setting").The artificial experiments are instructive, and the real-world experiments were performed very thoroughly although the results show only modest improvement.</figDesc><table><row><cell></cell><cell></cell><cell>5</cell><cell>8</cell><cell>-1.01</cell></row><row><cell></cell><cell>H1LYxY84l</cell><cell></cell><cell></cell><cell></cell></row><row><cell>R7</cell><cell>The author propose to use a off-policy actor-critic algorithm in a batch-setting to improve chat-</cell><cell>7</cell><cell>7</cell><cell>-1.77</cell></row><row><cell>Batch Policy Gradient Methods for Improving</cell><cell>bots.https://openreview.net/forum?id=rJfMusFll&amp;noteId=H1bSmrx4x</cell><cell></cell><cell></cell><cell></cell></row><row><cell>Neural</cell><cell></cell><cell></cell><cell></cell><cell></cell></row><row><cell>Conver-</cell><cell></cell><cell></cell><cell></cell><cell></cell></row><row><cell>sation</cell><cell></cell><cell></cell><cell></cell><cell></cell></row><row><cell>Models</cell><cell></cell><cell></cell><cell></cell><cell></cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_8"><head>Table 5 :</head><label>5</label><figDesc>A qualitative study of the effect of sentiment in the overall recommendation score prediction. Prediction → is the overall recommendation score predicted by our system, Actual → is the recommendation score given by reviewers. Senti Act are the output activations from the final layer of MLP Senti which are augmented to the decision layer for final recommendation score prediction. The correspondence between the sentiment embedded within the review texts and Sentiment Activations are fairly visible in Figure3. Kindly refer to Appendix A for polarity strengths in individual review sentences. The OpenReview links in the table above give the full review texts.</figDesc><table /></figure>
+			<note xmlns="http://www.tei-c.org/ns/1.0" place="foot" n="1">Apparently CVPR, NIPS, AAAI 2019 received over 5100, 4900, 7000 submissions respectively!</note>
+			<note xmlns="http://www.tei-c.org/ns/1.0" place="foot" n="2">https://openreview.net</note>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Acknowledgements</head><p>The first author, Tirthankar Ghosal, acknowledges Visvesvaraya PhD Scheme for Electronics and IT, an initiative of Ministry of Electronics and Information Technology (MeitY), Government of In-dia for fellowship support. The third author, Asif Ekbal, acknowledges Young Faculty Research Fellowship (YFRF), supported by Visvesvaraya PhD scheme for Electronics and IT, Ministry of Electronics and Information Technology (MeitY), Government of India, being implemented by Digital India Corporation (formerly Media Lab Asia). We also thank Elsevier Center of Excellence for Natural Language Processing, Indian Institute of Technology Patna for adequate infrastructural support to carry out this research. Finally, we appreciate the anonymous reviewers for their critical evaluation of our work and suggestions to carry forward from here.</p></div>
+			</div>
+
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<analytic>
+		<title level="a" type="main">Reliability of reviewers&apos; ratings when using public peer review: a case study</title>
+		<author>
+			<persName><forename type="first">Lutz</forename><surname>Bornmann</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H-D</forename><surname>Daniel</surname></persName>
+		</author>
+		<idno type="DOI">10.1087/20100207</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Learned Publishing</title>
+		<title level="j" type="abbrev">Learned Publishing</title>
+		<idno type="ISSN">0953-1513</idno>
+		<imprint>
+			<biblScope unit="volume">23</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="124" to="131" />
+			<date type="published" when="2010-04" />
+			<publisher>Wiley</publisher>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<analytic>
+		<title level="a" type="main">Universal Sentence Encoder for English</title>
+		<author>
+			<persName><forename type="first">Daniel</forename><surname>Cer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yinfei</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sheng-Yi</forename><surname>Kong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nan</forename><surname>Hua</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicole</forename><surname>Limtiaco</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rhomni</forename><surname>St. John</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Noah</forename><surname>Constant</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mario</forename><surname>Guajardo-Cespedes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Steve</forename><surname>Yuan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chris</forename><surname>Tar</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Brian</forename><surname>Strope</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ray</forename><surname>Kurzweil</surname></persName>
+		</author>
+		<idno type="DOI">10.18653/v1/d18-2029</idno>
+		<ptr type="open-access" target="https://www.aclweb.org/anthology/D18-2029.pdf" />
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing: System Demonstrations</title>
+				<meeting>the 2018 Conference on Empirical Methods in Natural Language Processing: System Demonstrations<address><addrLine>Brussels, Belgium</addrLine></address></meeting>
+		<imprint>
+			<publisher>Association for Computational Linguistics</publisher>
+			<date type="published" when="2018" />
+			<biblScope unit="page" from="169" to="174" />
+		</imprint>
+	</monogr>
+	<note>EMNLP 2018: System Demonstrations</note>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<monogr>
+		<title level="m" type="main">The toronto paper matching system: an automated paperreviewer assignment system</title>
+		<author>
+			<persName><forename type="first">Laurent</forename><surname>Charlin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Richard</forename><surname>Zemel</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2013" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main">Investigating domain features for scope detection and classification of scientific articles</title>
+		<author>
+			<persName><forename type="first">Tirthankar</forename><surname>Ghosal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ravi</forename><surname>Sonam</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sriparna</forename><surname>Saha</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Asif</forename><surname>Ekbal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pushpak</forename><surname>Bhattacharyya</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the Eleventh International Conference on Language Resources and Evaluation (LREC 2018)</title>
+				<meeting>the Eleventh International Conference on Language Resources and Evaluation (LREC 2018)<address><addrLine>Paris, France</addrLine></address></meeting>
+		<imprint>
+			<date type="published" when="2018" />
+		</imprint>
+	</monogr>
+	<note>European Language Resources Association (ELRA</note>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title level="a" type="main">Investigating Impact Features in Editorial Pre-Screening of Research Papers</title>
+		<author>
+			<persName><forename type="first">Tirthankar</forename><surname>Ghosal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rajeev</forename><surname>Verma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Asif</forename><surname>Ekbal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sriparna</forename><surname>Saha</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pushpak</forename><surname>Bhattacharyya</surname></persName>
+		</author>
+		<idno type="DOI">10.1145/3197026.3203910</idno>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 18th ACM/IEEE on Joint Conference on Digital Libraries - JCDL &apos;18</title>
+				<meeting>the 18th ACM/IEEE on Joint Conference on Digital Libraries - JCDL &apos;18</meeting>
+		<imprint>
+			<publisher>ACM Press</publisher>
+			<date type="published" when="2018" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<monogr>
+		<title level="m">ACM/IEEE on Joint Conference on Digital Libraries</title>
+				<meeting><address><addrLine>Fort Worth, TX, USA</addrLine></address></meeting>
+		<imprint>
+			<date type="published" when="2018-06-03" />
+			<biblScope unit="page" from="333" to="334" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main">VADER: A parsimonious rule-based model for sentiment analysis of social media text</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Clayton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Eric</forename><surname>Hutto</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Gilbert</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the Eighth International Conference on Weblogs and Social Media, ICWSM 2014</title>
+				<meeting>the Eighth International Conference on Weblogs and Social Media, ICWSM 2014<address><addrLine>Ann Arbor, Michigan, USA</addrLine></address></meeting>
+		<imprint>
+			<date type="published" when="2014-06-01" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<analytic>
+		<title level="a" type="main">A Dataset of Peer Reviews (PeerRead): Collection, Insights and NLP Applications</title>
+		<author>
+			<persName><forename type="first">Dongyeop</forename><surname>Kang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Waleed</forename><surname>Ammar</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bhavana</forename><surname>Dalvi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Madeleine</forename><surname>Zuylen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sebastian</forename><surname>Kohlmeier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Eduard</forename><forename type="middle">H</forename><surname>Hovy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Roy</forename><surname>Schwartz</surname></persName>
+		</author>
+		<idno type="DOI">10.18653/v1/n18-1149</idno>
+		<ptr type="open-access" target="https://www.aclweb.org/anthology/N18-1149.pdf" />
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)</title>
+				<meeting>the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)<address><addrLine>Louisiana, USA</addrLine></address></meeting>
+		<imprint>
+			<publisher>Association for Computational Linguistics</publisher>
+			<date type="published" when="2018" />
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page" from="1647" to="1661" />
+		</imprint>
+	</monogr>
+	<note>Long Papers</note>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<analytic>
+		<title level="a" type="main">The arbitrariness of reviews, and advice for school administrators</title>
+		<author>
+			<persName><forename type="first">John</forename><surname>Langford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mark</forename><surname>Guzdial</surname></persName>
+		</author>
+		<idno type="DOI">10.1145/2732417</idno>
+		<ptr type="open-access" target="http://dl.acm.org/ft_gateway.cfm?id=2732417&amp;type=pdf" />
+	</analytic>
+	<monogr>
+		<title level="j">Communications of the ACM</title>
+		<title level="j" type="abbrev">Commun. ACM</title>
+		<idno type="ISSN">0001-0782</idno>
+		<imprint>
+			<biblScope unit="volume">58</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="12" to="13" />
+			<date type="published" when="2015-03-23" />
+			<publisher>Association for Computing Machinery (ACM)</publisher>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<analytic>
+		<title level="a" type="main">Artificial intelligence in peer review: How can evolutionary computation support journal editors?</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Maciej</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Piotr</forename><surname>Mrowinski</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Agata</forename><surname>Fronczak</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Fronczak</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">PloS one</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<biblScope unit="issue">9</biblScope>
+			<biblScope unit="page">e0184711</biblScope>
+			<date type="published" when="2017" />
+		</imprint>
+	</monogr>
+	<note>Marcel Ausloos, and Olgica Nedic</note>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<analytic>
+		<title level="a" type="main">Computational support for academic peer review: a perspective from artificial intelligence</title>
+		<author>
+			<persName><forename type="first">Simon</forename><surname>Price</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Peter</forename><forename type="middle">A</forename><surname>Flach</surname></persName>
+		</author>
+		<idno type="DOI">10.1145/2979672</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Commun. ACM</title>
+		<imprint>
+			<biblScope unit="volume">60</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="70" to="79" />
+			<date type="published" when="2017" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<title level="a" type="main">Peer review: a flawed process at the heart of science and journals</title>
+		<author>
+			<persName><forename type="first">Richard</forename><surname>Smith</surname></persName>
+		</author>
+		<idno type="DOI">10.1258/jrsm.99.4.178</idno>
+		<idno type="PMID">16574968</idno>
+		<idno type="PMCID">PMC1420798</idno>
+		<ptr type="open-access" target="http://europepmc.org/articles/pmc1420798?pdf=render" />
+	</analytic>
+	<monogr>
+		<title level="j">Journal of the Royal Society of Medicine</title>
+		<title level="j" type="abbrev">Journal of the Royal Society of Medicine</title>
+		<idno type="ISSN">0141-0768</idno>
+		<imprint>
+			<biblScope unit="volume">99</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="178" to="182" />
+			<date type="published" when="2006-04-01" />
+			<publisher>SAGE Publications</publisher>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<analytic>
+		<title level="a" type="main">Sentiment Analysis of Peer Review Texts for Scholarly Papers</title>
+		<author>
+			<persName><forename type="first">Ke</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaojun</forename><surname>Wan</surname></persName>
+		</author>
+		<idno type="DOI">10.1145/3209978.3210056</idno>
+	</analytic>
+	<monogr>
+		<title level="m">The 41st International ACM SIGIR Conference on Research &amp; Development in Information Retrieval - SIGIR &apos;18</title>
+				<meeting><address><addrLine>Ann Arbor, MI, USA</addrLine></address></meeting>
+		<imprint>
+			<publisher>ACM Press</publisher>
+			<date type="published" when="2018" />
+			<biblScope unit="page" from="175" to="184" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>
