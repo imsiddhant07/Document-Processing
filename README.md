@@ -1,4 +1,4 @@
-# Simple python client for GROBID REST services
+# Have a look at my paper :)
 
 This Python client can be used to process in an efficient concurrent manner a set of PDF in a given directory by the [GROBID](https://github.com/kermitt2/grobid) service. It includes a command line for processing PDF on a file system and write results in a given output directory and a library for import in other python scripts. The client can also process similarly a list of files with reference strings (one per line).
 
